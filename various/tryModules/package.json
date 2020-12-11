@@ -1,0 +1,28 @@
+{
+  "name": "trymodules",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "assert": "node assert.js",
+    "spawnForkExec": "node spawnForkExec.js",
+    "fsModule": "nodemon fsModule.js",
+    "createNodeServer": "nodemon createNodeServer.js",
+    "eventEmitter": "node eventEmitter.js",
+    "repeat": "node repeat.js",
+    "streams": "node streams.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^3.2.0",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "assert": "^2.0.0",
+    "nodemon": "^2.0.6"
+  }
+}

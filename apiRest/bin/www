@@ -1,0 +1,103 @@
+#!/usr/bin/env node
+
+var debug = require('debug')('sample');
+var http = require('http');
+var cluster = require('cluster');
+var fs = require('fs');
+
+var app = require('../index');
+
+if (cluster.isMaster) {
+	cluster.fork();
+	cluster.fork();
+	cluster.fork();
+	cluster.fork();
+} else {
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+var server = http.createServer(app);
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+function normalizePort(val) {
+	var port = parseInt(val, 10);
+	
+	if (isNaN(port)) {
+		return val;
+	}
+
+	if (port >= 0) {
+		return port;
+	}
+	
+	return false;
+}
+
+function onError(error) {
+	if (error.syscall !== 'listen') {
+		throw error;
+	}
+
+	var bind = typeof port === 'string'
+		? 'Pipe' + port
+		: 'Port' + port;
+
+	switch (error.code) {
+		case 'EACCES':
+			console.error(bind + ' require elevated privileges');
+			process.exit(1);
+			break;
+		case 'EADDRINUSE':
+			console.error(bind + ' is already in use');
+			process.exit(1);
+			break;
+		default:
+			throw error;
+	}
+}
+
+function onListening() {
+	var addr = server.address();
+	var bind = typeof addr === 'string'
+		? 'pipe ' + addr
+		: 'port' + addr.port;
+	debug('listen on ' + bind);
+	console.log('listen on ' + bind);
+}
+
+process.on('uncaughtException', function(err) {
+	console.error('An uncaught error occured');
+	console.error(err.stack);
+})
+
+process.on('SIGINT', function onSigint(){
+	console.info('Got SIGINT' + new Date().toISOString());
+	shutdown();
+});
+
+process.on('SIGTERM', function onSigterm(){
+	console.info('Got SIGTERM' + new Date().toISOString());
+	shutdown();
+});
+
+function shutdown() {
+	server.stop(function onServerCloseErr(err) {
+		if (err) {
+			console.log('server close err');
+			process.exit(1);
+		}
+	})
+}
+
+process.on('exit', function() {
+	fs.writeFileSync('/tmp/myfile', 'This must be save on exit');
+})
+
+
+
+// close cluster.fork()
+}
